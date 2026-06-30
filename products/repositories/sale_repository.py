@@ -9,7 +9,7 @@ class SaleRepository:
 
     def find_all(self):
         """Devuelve todas las ventas registradas."""
-        return Sale.objects.all()
+        return Sale.objects.all().order_by('id')
 
     def find_by_id(self, sale_id):
         """Busca una venta por su ID. Devuelve None si no existe."""
