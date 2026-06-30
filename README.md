@@ -5,18 +5,12 @@ Lic. en Tecnología Informática — Introducción al Desarrollo de Software 202
 
 ---
 
-## Integrantes
-
-| Alumno | Módulo |
-|---|---|
-| Facu | Módulo de Clientes (`clients`) |
-| Emiliano | Módulo de Productos (`products`) |
 
 ---
 
 ## Descripción del Proyecto
 
-Sistema backend desarrollado con **Django** que simula un módulo de gestión comercial inspirado en SAP SD (Sales & Distribution). Expone una API REST que permite consultar productos y clientes almacenados en memoria.
+Sistema backend desarrollado con **Django** que simula un módulo de gestión comercial inspirado en SAP SD (Sales & Distribution). Expone una API REST que permite consultar productos almacenados en memoria.
 
 Los datos se gestionan en memoria (listas Python) en esta fase inicial, preparando la arquitectura para conectar una base de datos PostgreSQL en clases futuras.
 
@@ -45,7 +39,6 @@ El servidor queda disponible en `http://127.0.0.1:8000/`
 |---|---|---|---|
 | GET | `/products/` | Lista todos los productos | 200 OK — array JSON |
 | GET | `/products/<id>/` | Obtiene un producto por ID | 200 OK o 404 Not Found |
-| GET | `/clients/` | Lista todos los clientes | 200 OK — array JSON |
 
 ### Ejemplos de respuesta
 
@@ -152,7 +145,7 @@ class ProductService:
 
 ### DTO — `products/dto/product_dto.py`
 
-Data Transfer Object: define exactamente qué campos se exponen al cliente. Permite ocultar campos internos del modelo (como costos, datos sensibles) sin modificar la entidad.
+Data Transfer Object: define exactamente qué campos se exponen al usuario. Permite ocultar campos internos del modelo (como costos, datos sensibles) sin modificar la entidad.
 
 ```python
 class ProductDTO:
