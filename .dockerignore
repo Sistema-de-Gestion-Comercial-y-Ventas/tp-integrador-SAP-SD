@@ -1,0 +1,11 @@
+.git
+.agents
+.codex
+venv
+__pycache__
+*.pyc
+logs
+db.sqlite3
+.env
+.pytest_cache
+*.zip

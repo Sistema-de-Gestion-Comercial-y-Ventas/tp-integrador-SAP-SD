@@ -1,0 +1,39 @@
+services:
+  web:
+    build: .
+    container_name: tp_integrador_django
+    command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    environment:
+      DJANGO_DB_ENGINE: django.db.backends.postgresql
+      DJANGO_DB_NAME: tp_integrador
+      DJANGO_DB_USER: tp_user
+      DJANGO_DB_PASSWORD: tp_password
+      DJANGO_DB_HOST: db
+      DJANGO_DB_PORT: 5432
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:16
+    container_name: tp_integrador_postgres
+    environment:
+      POSTGRES_DB: tp_integrador
+      POSTGRES_USER: tp_user
+      POSTGRES_PASSWORD: tp_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tp_user -d tp_integrador"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
