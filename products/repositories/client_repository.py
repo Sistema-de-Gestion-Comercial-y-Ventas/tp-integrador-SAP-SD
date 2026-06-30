@@ -10,7 +10,7 @@ class ClientRepository:
 
     def find_all(self):
         """Devuelve todos los clientes registrados."""
-        return Client.objects.all()
+        return Client.objects.all().order_by('id')
 
     def find_by_id(self, client_id):
         """Busca un cliente por su ID. Devuelve None si no existe."""
