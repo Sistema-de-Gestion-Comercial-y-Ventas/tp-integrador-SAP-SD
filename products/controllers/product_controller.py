@@ -3,13 +3,10 @@ import logging
 
 from django.http import JsonResponse
 
-from products.services.product_service import ProductService
 from products.dto.product_dto import ProductDTO
-from products.exceptions.product_exception import ProductNotFoundException
+from products.exceptions.product_exception import ProductException, ProductNotFoundException
+from products.services.product_service import ProductService
 
-
-# Obtener un logger para este módulo.
-# El nombre __name__ se convierte en 'products.controllers.product_controller'
 
 logger = logging.getLogger(__name__)
 
@@ -20,20 +17,53 @@ class ProductController:
     def __init__(self):
         self.service = ProductService()
 
+    def products(self, request):
+        """Despacha operaciones sobre la coleccion publica de productos."""
+        if request.method == 'GET':
+            return self.get_products(request)
+
+        if request.method == 'POST':
+            return self.create_product(request)
+
+        return JsonResponse({'error': 'Metodo no permitido'}, status=405)
+
+    def product_detail(self, request, product_id):
+        """Despacha operaciones sobre un producto puntual."""
+        if request.method == 'GET':
+            return self.get_product_by_id(request, product_id)
+
+        if request.method == 'PUT':
+            return self.update_product(request, product_id)
+
+        if request.method == 'DELETE':
+            return self.delete_product(request, product_id)
+
+        return JsonResponse({'error': 'Metodo no permitido'}, status=405)
+
+    def admin_product_detail(self, request, product_id):
+        """Despacha operaciones administrativas sobre un producto puntual."""
+        if request.method == 'PUT':
+            return self.update_product(request, product_id)
+
+        if request.method == 'DELETE':
+            return self.delete_product(request, product_id)
+
+        return JsonResponse({'error': 'Metodo no permitido'}, status=405)
+
     def get_products(self, _request):
         """Maneja GET /products/. Devuelve la lista completa de productos en formato JSON."""
         logger.info('GET /products/ - Consultando lista de productos')
 
         try:
             products = self.service.get_products()
-
-            data = []
-            for product in products:
-                data.append({
+            data = [
+                {
                     'id': product.product_id,
                     'name': product.name,
                     'price': product.price,
-                })
+                }
+                for product in products
+            ]
 
             logger.info('GET /products/ - %s productos encontrados', len(data))
             return JsonResponse(data, safe=False, status=200)
@@ -66,88 +96,95 @@ class ProductController:
             return JsonResponse({'error': 'Error interno del servidor'}, status=500)
 
     def create_product(self, request):
-        """Maneja POST /admin/products/. Crea un producto nuevo."""
-        if request.method != 'POST':
-            return JsonResponse({'error': 'Método no permitido'}, status=405)
+        """Maneja POST /products/ y POST /admin/products/."""
+        logger.info('POST %s - Creando producto', request.path)
 
-        logger.info('POST /admin/products/ - Creando producto')
+        if request.method != 'POST':
+            return JsonResponse({'error': 'Metodo no permitido'}, status=405)
 
         try:
-            data = json.loads(request.body)
-            product_id = data.get('id')
-            name = data.get('name')
-            price = data.get('price')
+            payload = self._get_json_payload(request)
 
-            product = self.service.create_product(product_id, name, price)
+            if request.path.startswith('/admin/products/'):
+                product = self.service.create_product(
+                    payload.get('id'),
+                    payload.get('name'),
+                    payload.get('price'),
+                )
+            else:
+                product = self.service.create_product(
+                    payload.get('name'),
+                    payload.get('price'),
+                )
+
             dto = ProductDTO(product.product_id, product.name, product.price)
 
-            logger.info('POST /admin/products/ - Producto creado correctamente')
+            logger.info('POST %s - Producto creado con ID %s', request.path, product.product_id)
             return JsonResponse(dto.to_dict(), status=201)
 
-        except ValueError as error:
-            logger.warning('POST /admin/products/ - %s', error)
-            return JsonResponse({'error': str(error)}, status=400)
+        except ProductException as error:
+            logger.warning('POST %s - %s', request.path, error.message)
+            return JsonResponse({'error': error.message}, status=error.status_code)
+
+        except json.JSONDecodeError:
+            logger.warning('POST %s - JSON invalido', request.path)
+            return JsonResponse({'error': 'JSON invalido'}, status=400)
 
         except Exception as error:
             logger.error('Error en create_product: %s', error)
             return JsonResponse({'error': 'Error interno del servidor'}, status=500)
 
-    def admin_product_detail(self, request, product_id):
-        """Maneja PUT y DELETE sobre /admin/products/<id>/."""
-        if request.method == 'PUT':
-            return self.update_product(request, product_id)
-        if request.method == 'DELETE':
-            return self.delete_product(request, product_id)
-        return JsonResponse({'error': 'Método no permitido'}, status=405)
-
     def update_product(self, request, product_id):
-        """Actualiza un producto existente."""
-        logger.info('PUT /admin/products/%s/ - Actualizando producto', product_id)
+        """Maneja PUT /products/<id>/ y PUT /admin/products/<id>/."""
+        logger.info('PUT %s - Actualizando producto', request.path)
 
         try:
-            data = json.loads(request.body)
-            name = data.get('name')
-            price = data.get('price')
-
-            product = self.service.update_product(product_id, name, price)
-            if product is None:
-                raise ProductNotFoundException(product_id)
-
+            payload = self._get_json_payload(request)
+            product = self.service.update_product(
+                product_id,
+                payload.get('name'),
+                payload.get('price'),
+            )
             dto = ProductDTO(product.product_id, product.name, product.price)
 
-            logger.info('PUT /admin/products/%s/ - Producto actualizado correctamente', product_id)
+            logger.info('PUT %s - Producto actualizado', request.path)
             return JsonResponse(dto.to_dict(), status=200)
 
-        except ProductNotFoundException as error:
-            logger.warning('PUT /admin/products/%s/ - %s', product_id, error.message)
+        except ProductException as error:
+            logger.warning('PUT %s - %s', request.path, error.message)
             return JsonResponse({'error': error.message}, status=error.status_code)
 
-        except ValueError as error:
-            logger.warning('PUT /admin/products/%s/ - %s', product_id, error)
-            return JsonResponse({'error': str(error)}, status=400)
+        except json.JSONDecodeError:
+            logger.warning('PUT %s - JSON invalido', request.path)
+            return JsonResponse({'error': 'JSON invalido'}, status=400)
 
         except Exception as error:
             logger.error('Error en update_product: %s', error)
             return JsonResponse({'error': 'Error interno del servidor'}, status=500)
 
     def delete_product(self, request, product_id):
-        """Elimina un producto existente."""
-        logger.info('DELETE /admin/products/%s/ - Eliminando producto', product_id)
+        """Maneja DELETE /products/<id>/ y DELETE /admin/products/<id>/."""
+        logger.info('DELETE %s - Eliminando producto', request.path)
 
         try:
-            deleted = self.service.delete_product(product_id)
-            if not deleted:
-                raise ProductNotFoundException(product_id)
+            self.service.delete_product(product_id)
 
-            logger.info('DELETE /admin/products/%s/ - Producto eliminado correctamente', product_id)
+            logger.info('DELETE %s - Producto eliminado', request.path)
             return JsonResponse({'message': 'Producto eliminado correctamente.'}, status=200)
 
-        except ProductNotFoundException as error:
-            logger.warning('DELETE /admin/products/%s/ - %s', product_id, error.message)
+        except ProductException as error:
+            logger.warning('DELETE %s - %s', request.path, error.message)
             return JsonResponse({'error': error.message}, status=error.status_code)
 
         except Exception as error:
             logger.error('Error en delete_product: %s', error)
             return JsonResponse({'error': 'Error interno del servidor'}, status=500)
 
+    def _get_json_payload(self, request):
+        """Obtiene el cuerpo JSON de una peticion HTTP."""
+        body = request.body.decode('utf-8')
 
+        if not body:
+            return {}
+
+        return json.loads(body)
