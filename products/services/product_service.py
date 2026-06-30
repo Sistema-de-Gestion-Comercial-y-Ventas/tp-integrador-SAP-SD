@@ -1,10 +1,15 @@
+from products.exceptions.product_exception import (
+    ProductAlreadyExistsException,
+    ProductNotFoundException,
+    ProductValidationException,
+)
 from products.models.product import Product
 from products.repositories.product_repository import ProductRepository
 from products.validators.product_validator import ProductValidator
 
 
 class ProductService:
-    """Servicio de productos. Contiene la lógica de negocio y coordina el acceso a datos a través del Repository."""
+    """Servicio de productos. Contiene la logica de negocio."""
 
     def __init__(self):
         self.repository = ProductRepository()
@@ -15,24 +20,68 @@ class ProductService:
         return self.repository.find_all()
 
     def get_product_by_id(self, product_id):
-        """Obtiene un producto específico por su ID."""
+        """Obtiene un producto especifico por su ID."""
         return self.repository.find_by_id(product_id)
 
-    def create_product(self, product_id, name, price):
-        """Crea un nuevo producto validando sus datos."""
-        self.validator.validate_name(name)
-        self.validator.validate_price(price)
+    def create_product(self, *args):
+        """
+        Crea un producto.
+        Acepta (name, price) para ID automatico o (product_id, name, price)
+        para mantener compatibilidad con endpoints administrativos.
+        """
+        if len(args) == 2:
+            product_id = None
+            name, price = args
+        elif len(args) == 3:
+            product_id, name, price = args
+        else:
+            raise ProductValidationException('Datos de producto invalidos.')
 
-        product = Product(product_id, name, price)
-        return self.repository.create(product)
+        self._validate_product_data(name, price)
+
+        if self.repository.find_by_name(name) is not None:
+            raise ProductAlreadyExistsException(name)
+
+        if product_id is None:
+            return self.repository.save(name.strip(), price)
+
+        try:
+            product = Product(product_id, name.strip(), price)
+            return self.repository.create(product)
+        except ValueError as error:
+            raise ProductValidationException(str(error)) from error
 
     def update_product(self, product_id, name, price):
         """Actualiza un producto existente validando sus datos."""
-        self.validator.validate_name(name)
-        self.validator.validate_price(price)
+        product = self.repository.find_by_id(product_id)
 
-        return self.repository.update(product_id, name, price)
+        if product is None:
+            raise ProductNotFoundException(product_id)
+
+        self._validate_product_data(name, price)
+
+        product_with_same_name = self.repository.find_by_name(name)
+        if (
+            product_with_same_name is not None
+            and product_with_same_name.product_id != product_id
+        ):
+            raise ProductAlreadyExistsException(name)
+
+        return self.repository.update(product_id, name.strip(), price)
 
     def delete_product(self, product_id):
         """Elimina un producto por su ID."""
-        return self.repository.delete(product_id) 
+        deleted = self.repository.delete(product_id)
+
+        if not deleted:
+            raise ProductNotFoundException(product_id)
+
+        return True
+
+    def _validate_product_data(self, name, price):
+        """Centraliza las validaciones del producto."""
+        try:
+            self.validator.validate_name(name)
+            self.validator.validate_price(price)
+        except ValueError as error:
+            raise ProductValidationException(str(error)) from error
