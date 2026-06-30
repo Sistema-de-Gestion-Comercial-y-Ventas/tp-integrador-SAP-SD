@@ -30,6 +30,27 @@ El servidor queda disponible en `http://127.0.0.1:8000/`
 
 ---
 
+## Ejecucion con Docker
+
+El proyecto incluye una configuracion base con Django y PostgreSQL para desarrollo local.
+
+```bash
+# Construir y levantar los servicios
+docker compose up --build
+
+# Detener los servicios
+docker compose down
+```
+
+Servicios incluidos:
+
+- `web`: aplicacion Django disponible en `http://127.0.0.1:8000/`
+- `db`: PostgreSQL disponible en el puerto `5432`
+
+> La configuracion de PostgreSQL queda preparada en Docker Compose. La conexion final desde Django se completa cuando el modulo de ORM/PostgreSQL actualice `config/settings.py`.
+
+---
+
 ## Endpoints disponibles
 
 | Metodo | URL | Descripcion | Respuesta |
