@@ -26,9 +26,7 @@ class ClientService:
         self.validator.validate_name(name)
         self.validator.validate_email(email)
         self.validator.validate_phone(phone)
-
-        client = Client(client_id, name, email, phone)
-        return self.repository.create(client)
+        return self.repository.create(name, email, phone)
 
     def update_client(self, client_id, name, email, phone):
         """Actualiza un cliente existente validando sus datos."""

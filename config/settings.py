@@ -73,6 +73,9 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
+# NOTA: Configurado temporalmente con SQLite para desarrollo.
+# Persona 2 lo cambiará a PostgreSQL con Docker en feature/docker-infra
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
