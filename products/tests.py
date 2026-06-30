@@ -1,23 +1,27 @@
 import json
 
-from django.test import Client as DjangoClient, SimpleTestCase, override_settings
+from django.test import Client as DjangoClient, TestCase
 
-from products.repositories.client_repository import ClientRepository
-from products.repositories.product_repository import ProductRepository
+from products.models.client import Client
+from products.models.product import Product
+from products.models.sale import Sale
 from products.services.client_service import ClientService
 from products.services.product_service import ProductService
 
 
-class ProductServiceTests(SimpleTestCase):
+class ProductServiceTests(TestCase):
 
     def setUp(self):
-        ProductRepository.reset_data()
+        # Crear productos de prueba en la base de datos
+        Product.objects.create(name="Mouse Gamer", price=15000)
+        Product.objects.create(name="Teclado Mecanico", price=45000)
+        Product.objects.create(name="Smart Watch", price=120000)
         self.service = ProductService()
 
     def test_get_products_returns_the_existing_products(self):
         products = self.service.get_products()
 
-        self.assertEqual(len(products), 3)
+        self.assertEqual(products.count(), 3)
         self.assertEqual(products[0].name, "Mouse Gamer")
 
     def test_get_product_by_id_returns_the_requested_product(self):
@@ -26,19 +30,12 @@ class ProductServiceTests(SimpleTestCase):
         self.assertEqual(product.name, "Teclado Mecanico")
         self.assertEqual(product.price, 45000)
 
-    def test_create_product_with_explicit_id(self):
-        product = self.service.create_product(10, "Monitor 27", 180000)
+    def test_create_product(self):
+        product = self.service.create_product("Monitor 27", 180000)
 
-        self.assertEqual(product.product_id, 10)
         self.assertEqual(product.name, "Monitor 27")
         self.assertEqual(product.price, 180000)
-
-    def test_create_product_with_automatic_id(self):
-        product = self.service.create_product("Auriculares", 65000)
-
-        self.assertEqual(product.product_id, 4)
-        self.assertEqual(product.name, "Auriculares")
-        self.assertEqual(product.price, 65000)
+        self.assertIsNotNone(product.id)
 
     def test_update_product(self):
         product = self.service.update_product(2, "Teclado Profesional", 55000)
@@ -54,18 +51,21 @@ class ProductServiceTests(SimpleTestCase):
         self.assertIsNone(self.service.get_product_by_id(3))
 
 
-class ClientServiceTests(SimpleTestCase):
+class ClientServiceTests(TestCase):
 
     def setUp(self):
-        ClientRepository.reset_data()
+        # Crear clientes de prueba en la base de datos
+        Client.objects.create(name="Juan Pérez", email="juan.perez@gmail.com", phone="1122334455")
+        Client.objects.create(name="María Gómez", email="maria.gomez@gmail.com", phone="1166778899")
+        Client.objects.create(name="Carlos López", email="carlos.lopez@gmail.com", phone="1199887766")
         self.service = ClientService()
 
     def test_create_client(self):
         client = self.service.create_client(10, "Ana Garcia", "ana.garcia@mail.com", "1122334455")
 
-        self.assertEqual(client.client_id, 10)
         self.assertEqual(client.name, "Ana Garcia")
         self.assertEqual(client.email, "ana.garcia@mail.com")
+        self.assertIsNotNone(client.id)
 
     def test_update_client(self):
         client = self.service.update_client(2, "Maria Actualizada", "maria.actualizada@mail.com", "1188997766")
@@ -85,11 +85,13 @@ class ClientServiceTests(SimpleTestCase):
             self.service.create_client(10, "Ana Garcia", "email-invalido", "1122334455")
 
 
-@override_settings(ALLOWED_HOSTS=['localhost', 'testserver'])
-class ClientControllerTests(SimpleTestCase):
+class ClientControllerTests(TestCase):
 
     def setUp(self):
-        ClientRepository.reset_data()
+        # Crear clientes de prueba en la base de datos
+        Client.objects.create(name="Juan Pérez", email="juan.perez@gmail.com", phone="1122334455")
+        Client.objects.create(name="María Gómez", email="maria.gomez@gmail.com", phone="1166778899")
+        Client.objects.create(name="Carlos López", email="carlos.lopez@gmail.com", phone="1199887766")
         self.client = DjangoClient()
 
     def test_get_clients_via_api(self):
@@ -131,11 +133,13 @@ class ClientControllerTests(SimpleTestCase):
         self.assertEqual(response.json()["message"], "Cliente eliminado correctamente.")
 
 
-@override_settings(ALLOWED_HOSTS=['localhost', 'testserver'])
-class ProductControllerTests(SimpleTestCase):
+class ProductControllerTests(TestCase):
 
     def setUp(self):
-        ProductRepository.reset_data()
+        # Crear productos de prueba en la base de datos
+        Product.objects.create(name="Mouse Gamer", price=15000)
+        Product.objects.create(name="Teclado Mecanico", price=45000)
+        Product.objects.create(name="Smart Watch", price=120000)
         self.client = DjangoClient()
 
     def test_get_products_via_api(self):
@@ -158,7 +162,7 @@ class ProductControllerTests(SimpleTestCase):
         )
 
         self.assertEqual(response.status_code, 201)
-        self.assertEqual(response.json()["id"], 4)
+        self.assertIsNotNone(response.json()["id"])
         self.assertEqual(response.json()["name"], "Monitor LED")
 
     def test_update_product_via_public_api(self):

@@ -58,9 +58,9 @@ class ProductController:
             products = self.service.get_products()
             data = [
                 {
-                    'id': product.product_id,
+                    'id': product.id,
                     'name': product.name,
-                    'price': product.price,
+                    'price': float(product.price),
                 }
                 for product in products
             ]
@@ -82,7 +82,7 @@ class ProductController:
             if product is None:
                 raise ProductNotFoundException(product_id)
 
-            dto = ProductDTO(product.product_id, product.name, product.price)
+            dto = ProductDTO(product.id, product.name, product.price)
 
             logger.info('GET /products/%s/ - Producto encontrado', product_id)
             return JsonResponse(dto.to_dict(), status=200)
@@ -117,9 +117,9 @@ class ProductController:
                     payload.get('price'),
                 )
 
-            dto = ProductDTO(product.product_id, product.name, product.price)
+            dto = ProductDTO(product.id, product.name, product.price)
 
-            logger.info('POST %s - Producto creado con ID %s', request.path, product.product_id)
+            logger.info('POST %s - Producto creado con ID %s', request.path, product.id)
             return JsonResponse(dto.to_dict(), status=201)
 
         except ProductException as error:
@@ -145,7 +145,7 @@ class ProductController:
                 payload.get('name'),
                 payload.get('price'),
             )
-            dto = ProductDTO(product.product_id, product.name, product.price)
+            dto = ProductDTO(product.id, product.name, product.price)
 
             logger.info('PUT %s - Producto actualizado', request.path)
             return JsonResponse(dto.to_dict(), status=200)

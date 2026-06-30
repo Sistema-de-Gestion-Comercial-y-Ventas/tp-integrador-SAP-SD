@@ -1,16 +1,22 @@
-class Product:     
-    """     
-    Modelo que representa un producto del catálogo.       
-    IMPORTANTE: Esta clase NO hereda de django.db.models.Model     
-    porque en esta fase inicial no usamos base de datos.     
-    Los datos se almacenan en memoria usando listas Python.     
-    """ 
+from django.db import models
 
-    def __init__(self, product_id, name, price):         
-        self.product_id = product_id   # Identificador único del producto         
-        self.name = name               # Nombre del producto         
-        self.price = price             # Precio en pesos       
-    
-    def __repr__(self):         
-        """Representación legible del objeto (útil para debugging)."""         
-        return f'Product(id={self.product_id}, name={self.name}, price={self.price})'
+
+class Product(models.Model):
+    """
+    Modelo Django que representa un producto del catálogo.
+    Almacenado en PostgreSQL.
+    """
+    name = models.CharField(max_length=255, null=False)
+    price = models.DecimalField(max_digits=10, decimal_places=2, null=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'products'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f'Product(id={self.id}, name={self.name}, price={self.price})'
+
+    def __repr__(self):
+        return self.__str__()

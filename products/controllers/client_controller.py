@@ -36,7 +36,7 @@ class ClientController:
             data = []
             for client in clients:
                 data.append({
-                    "id": client.client_id,
+                    "id": client.id,
                     "name": client.name,
                     "email": client.email,
                     "phone": client.phone
@@ -57,7 +57,7 @@ class ClientController:
             if client is None:
                 raise ClientNotFoundException(client_id)
 
-            dto = ClientDTO(client.client_id, client.name, client.email, client.phone)
+            dto = ClientDTO(client.id, client.name, client.email, client.phone)
             logger.info("GET /clients/%s/ - Cliente encontrado", client_id)
             return JsonResponse(dto.to_dict(), status=200)
 
@@ -80,7 +80,7 @@ class ClientController:
             phone = data.get('phone')
 
             client = self.service.create_client(client_id, name, email, phone)
-            dto = ClientDTO(client.client_id, client.name, client.email, client.phone)
+            dto = ClientDTO(client.id, client.name, client.email, client.phone)
 
             logger.info("POST /clients/ - Cliente creado correctamente")
             return JsonResponse(dto.to_dict(), status=201)
@@ -119,7 +119,7 @@ class ClientController:
             if client is None:
                 raise ClientNotFoundException(client_id)
 
-            dto = ClientDTO(client.client_id, client.name, client.email, client.phone)
+            dto = ClientDTO(client.id, client.name, client.email, client.phone)
             logger.info("PUT /clients/%s/ - Cliente actualizado correctamente", client_id)
             return JsonResponse(dto.to_dict(), status=200)
 

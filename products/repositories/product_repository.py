@@ -3,83 +3,49 @@ from products.models.product import Product
 
 class ProductRepository:
     """
-    Repositorio de productos.
-    Simula una base de datos usando una lista de objetos en memoria.
-    En clases futuras, aqui se usaran consultas a PostgreSQL.
+    Repositorio de productos usando Django ORM.
+    Consulta a PostgreSQL a través del ORM de Django.
     """
-
-    _initial_products_data = [
-        (1, 'Mouse Gamer', 15000),
-        (2, 'Teclado Mecanico', 45000),
-        (3, 'Smart Watch', 120000),
-    ]
-    products = [Product(*data) for data in _initial_products_data]
-
-    @classmethod
-    def reset_data(cls):
-        """Restablece la lista de productos a su estado inicial."""
-        cls.products = [Product(*data) for data in cls._initial_products_data]
 
     def find_all(self):
         """Devuelve todos los productos disponibles."""
-        return self.products
+        return Product.objects.all().order_by('id')
 
     def find_by_id(self, product_id):
         """Busca un producto por su ID. Devuelve None si no existe."""
-        for product in self.products:
-            if product.product_id == product_id:
-                return product
-
-        return None
+        try:
+            return Product.objects.get(id=product_id)
+        except Product.DoesNotExist:
+            return None
 
     def find_by_name(self, name):
         """Busca un producto por nombre. Devuelve None si no existe."""
-        normalized_name = name.strip().lower()
+        try:
+            return Product.objects.get(name__iexact=name)
+        except Product.DoesNotExist:
+            return None
 
-        for product in self.products:
-            if product.name.strip().lower() == normalized_name:
-                return product
-
-        return None
-
-    def save(self, name, price):
-        """Agrega un producto nuevo con ID automatico."""
-        product = Product(self._get_next_id(), name, price)
-        self.products.append(product)
-        return product
-
-    def create(self, product):
-        """Agrega un producto con ID definido por el caller."""
-        if self.find_by_id(product.product_id) is not None:
-            raise ValueError(f'Ya existe un producto con ID {product.product_id}.')
-
-        self.products.append(product)
+    def create(self, name, price):
+        """Crea un nuevo producto."""
+        product = Product.objects.create(name=name, price=price)
         return product
 
     def update(self, product_id, name, price):
         """Actualiza los datos de un producto existente."""
-        product = self.find_by_id(product_id)
-
-        if product is None:
+        try:
+            product = Product.objects.get(id=product_id)
+            product.name = name
+            product.price = price
+            product.save()
+            return product
+        except Product.DoesNotExist:
             return None
-
-        product.name = name
-        product.price = price
-        return product
 
     def delete(self, product_id):
         """Elimina un producto por su ID."""
-        product = self.find_by_id(product_id)
-
-        if product is None:
+        try:
+            product = Product.objects.get(id=product_id)
+            product.delete()
+            return True
+        except Product.DoesNotExist:
             return False
-
-        self.products.remove(product)
-        return True
-
-    def _get_next_id(self):
-        """Calcula el proximo ID disponible."""
-        if not self.products:
-            return 1
-
-        return max(product.product_id for product in self.products) + 1
