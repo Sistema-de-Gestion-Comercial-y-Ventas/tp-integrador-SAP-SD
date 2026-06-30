@@ -25,8 +25,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     # Endpoints publicos de clientes
-    path('clients/', client_controller.client_collection),
-    path('clients/<int:client_id>/', client_controller.client_detail),
+    path('clients/', csrf_exempt(client_controller.client_collection)),
+    path('clients/<int:client_id>/', csrf_exempt(client_controller.client_detail)),
 
     # Endpoints de ventas
     path('sales/', sale_controller.get_sales),
