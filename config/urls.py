@@ -3,11 +3,13 @@ from django.urls import path
 
 from products.controllers.client_controller import ClientController
 from products.controllers.product_controller import ProductController
+from products.controllers.sale_controller import SaleController
 
 
 # Se crea UNA SOLA instancia del controller a nivel de módulo. Esto evita crear una nueva instancia en cada petición HTTP.
 product_controller = ProductController()
 client_controller = ClientController()
+sale_controller = SaleController()
 
 urlpatterns = [
     # Endpoints de administración de productos
@@ -24,4 +26,8 @@ urlpatterns = [
     # Endpoints públicos de clientes
     path('clients/', client_controller.client_collection),
     path('clients/<int:client_id>/', client_controller.client_detail),
+
+    # Endpoints de ventas
+    path('sales/', sale_controller.get_sales),
+    path('sales/<int:sale_id>/', sale_controller.get_sale_by_id),
 ]
