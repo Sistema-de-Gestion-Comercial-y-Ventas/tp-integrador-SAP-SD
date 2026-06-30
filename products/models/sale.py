@@ -1,21 +1,32 @@
-class Sale:
-    """
-    Modelo que representa una venta u operación comercial.
-    IMPORTANTE: Esta clase NO hereda de django.db.models.Model
-    porque en esta fase inicial los datos se almacenan en memoria usando listas de Python.
-    """
+from django.db import models
+from products.models.client import Client
+from products.models.product import Product
 
-    def __init__(self, sale_id, client_id, product_id, quantity, status):
-        self.sale_id = sale_id          # Identificador único de la venta
-        self.client_id = client_id      # Cliente asociado a la venta
-        self.product_id = product_id    # Producto vendido
-        self.quantity = quantity        # Cantidad vendida
-        self.status = status            # Estado de la venta
+
+class Sale(models.Model):
+    """
+    Modelo Django que representa una venta u operación comercial.
+    Almacenado en PostgreSQL.
+    """
+    STATUS_CHOICES = [
+        ('pending', 'Pendiente'),
+        ('completed', 'Completada'),
+        ('cancelled', 'Cancelada'),
+    ]
+
+    client = models.ForeignKey(Client, on_delete=models.PROTECT)
+    product = models.ForeignKey(Product, on_delete=models.PROTECT)
+    quantity = models.PositiveIntegerField(null=False)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'sales'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Sale(id={self.id}, client_id={self.client_id}, product_id={self.product_id}, quantity={self.quantity}, status={self.status})"
 
     def __repr__(self):
-        """Representación legible del objeto, útil para debugging."""
-        return (
-            f"Sale(id={self.sale_id}, client_id={self.client_id}, "
-            f"product_id={self.product_id}, quantity={self.quantity}, "
-            f"status={self.status})"
-        )
+        return self.__str__()

@@ -28,7 +28,7 @@ class SaleService:
 
             data.append(
                 SaleDTO(
-                    sale.sale_id,
+                    sale.id,
                     sale.client_id,
                     sale.product_id,
                     sale.quantity,
@@ -53,7 +53,7 @@ class SaleService:
             total = product.price * sale.quantity
 
         return SaleDTO(
-            sale.sale_id,
+            sale.id,
             sale.client_id,
             sale.product_id,
             sale.quantity,

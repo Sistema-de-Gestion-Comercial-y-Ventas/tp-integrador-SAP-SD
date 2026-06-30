@@ -30,9 +30,9 @@ class ProductService:
         para mantener compatibilidad con endpoints administrativos.
         """
         if len(args) == 2:
-            product_id = None
             name, price = args
         elif len(args) == 3:
+            # product_id se ignora con ORM (auto-generado)
             product_id, name, price = args
         else:
             raise ProductValidationException('Datos de producto invalidos.')
@@ -42,14 +42,7 @@ class ProductService:
         if self.repository.find_by_name(name) is not None:
             raise ProductAlreadyExistsException(name)
 
-        if product_id is None:
-            return self.repository.save(name.strip(), price)
-
-        try:
-            product = Product(product_id, name.strip(), price)
-            return self.repository.create(product)
-        except ValueError as error:
-            raise ProductValidationException(str(error)) from error
+        return self.repository.create(name.strip(), price)
 
     def update_product(self, product_id, name, price):
         """Actualiza un producto existente validando sus datos."""
@@ -63,7 +56,7 @@ class ProductService:
         product_with_same_name = self.repository.find_by_name(name)
         if (
             product_with_same_name is not None
-            and product_with_same_name.product_id != product_id
+            and product_with_same_name.id != product_id
         ):
             raise ProductAlreadyExistsException(name)
 

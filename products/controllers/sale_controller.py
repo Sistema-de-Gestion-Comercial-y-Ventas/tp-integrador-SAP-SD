@@ -22,12 +22,12 @@ class SaleController:
         logger.info("GET /sales/ - Consultando lista de ventas")
 
         try:
-            sales = self.service.get_sales()
+            sales_dtos = self.service.get_sales()
 
             data = []
 
-            for sale in sales:
-                data.append(sale.to_dict())
+            for sale_dto in sales_dtos:
+                data.append(sale_dto.to_dict())
 
             logger.info("GET /sales/ - %s ventas encontradas", len(data))
 
@@ -46,12 +46,12 @@ class SaleController:
         logger.info("GET /sales/%s/ - Consultando venta por ID", sale_id)
 
         try:
-            sale = self.service.get_sale_by_id(sale_id)
+            sale_dto = self.service.get_sale_by_id(sale_id)
 
-            if sale is None:
+            if sale_dto is None:
                 raise SaleNotFoundException(sale_id)
 
-            return JsonResponse(sale.to_dict(), status=200)
+            return JsonResponse(sale_dto.to_dict(), status=200)
 
         except SaleNotFoundException as error:
             logger.warning("Venta no encontrada: %s", error.message)
