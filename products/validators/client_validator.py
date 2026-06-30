@@ -8,3 +8,7 @@ class ClientValidator:
     def validate_email(self, email):
         if not email or '@' not in email:
             raise ValueError('El email no es válido.')
+
+    def validate_phone(self, phone):
+        if not phone or len(str(phone).strip()) < 7:
+            raise ValueError('El teléfono debe tener al menos 7 dígitos.')
