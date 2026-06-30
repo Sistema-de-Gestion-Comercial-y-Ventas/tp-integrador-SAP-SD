@@ -1,136 +1,161 @@
-# TP Integrador - Sistema de Gestion Comercial y Ventas (SAP SD)
-
-**Universidad Escuela Argentina de Negocios (UEAN)**  
-Lic. en Tecnologia Informatica - Introduccion al Desarrollo de Software 2026
-
----
-
-## Descripcion del Proyecto
-
-Sistema backend desarrollado con **Django** que simula un modulo de gestion comercial inspirado en SAP SD (Sales & Distribution). Expone una API REST que permite consultar y administrar productos, clientes y operaciones comerciales almacenadas en memoria.
-
-Los datos se gestionan en memoria (listas Python) en esta fase inicial, preparando la arquitectura para conectar una base de datos PostgreSQL en clases futuras.
-
----
-
-## Como ejecutar el proyecto
-
-```bash
-# 1. Activar el entorno virtual
-.\venv\Scripts\activate
-
-# 2. Aplicar migraciones iniciales (solo la primera vez)
-python manage.py migrate
-
-# 3. Iniciar el servidor de desarrollo
-python manage.py runserver
-```
-
-El servidor queda disponible en `http://127.0.0.1:8000/`
-
----
-
-## Ejecucion con Docker
-
-El proyecto incluye una configuracion base con Django y PostgreSQL para desarrollo local.
-
-```bash
-# Construir y levantar los servicios
-docker compose up --build
-
-# Detener los servicios
-docker compose down
-```
-
-Servicios incluidos:
-
-- `web`: aplicacion Django disponible en `http://127.0.0.1:8000/`
-- `db`: PostgreSQL disponible en el puerto `5432`
-
-> La configuracion de PostgreSQL queda preparada en Docker Compose. La conexion final desde Django se completa cuando el modulo de ORM/PostgreSQL actualice `config/settings.py`.
-
----
-
-## Endpoints disponibles
-
-| Metodo | URL | Descripcion | Respuesta |
-|---|---|---|---|
-| GET | `/products/` | Lista todos los productos | 200 OK - array JSON |
-| GET | `/products/<id>/` | Obtiene un producto por ID | 200 OK o 404 Not Found |
-| POST | `/products/` | Crea un producto con ID automatico | 201 Created, 400 Bad Request o 409 Conflict |
-| PUT | `/products/<id>/` | Modifica un producto existente | 200 OK, 400 Bad Request, 404 Not Found o 409 Conflict |
-| DELETE | `/products/<id>/` | Elimina un producto existente | 200 OK o 404 Not Found |
-| POST | `/admin/products/` | Crea un producto indicando ID | 201 Created, 400 Bad Request o 409 Conflict |
-| PUT | `/admin/products/<id>/` | Modifica un producto desde ruta administrativa | 200 OK, 400 Bad Request, 404 Not Found o 409 Conflict |
-| DELETE | `/admin/products/<id>/` | Elimina un producto desde ruta administrativa | 200 OK o 404 Not Found |
-| GET | `/clients/` | Lista todos los clientes | 200 OK - array JSON |
-| GET | `/clients/<id>/` | Obtiene un cliente por ID | 200 OK o 404 Not Found |
-| POST | `/clients/` | Crea un cliente | 201 Created o error de validacion |
-| PUT | `/clients/<id>/` | Modifica un cliente | 200 OK o error |
-| DELETE | `/clients/<id>/` | Elimina un cliente | 200 OK o 404 Not Found |
-| GET | `/sales/` | Lista todas las ventas | 200 OK - array JSON |
-| GET | `/sales/<id>/` | Obtiene una venta por ID | 200 OK o 404 Not Found |
-
-### Ejemplos de productos
-
-**GET /products/**
-```json
-[
-  { "id": 1, "name": "Mouse Gamer", "price": 15000 },
-  { "id": 2, "name": "Teclado Mecanico", "price": 45000 },
-  { "id": 3, "name": "Smart Watch", "price": 120000 }
-]
-```
-
-**POST /products/**
-```json
-{
-  "name": "Monitor LED",
-  "price": 90000
-}
-```
-
-Respuesta esperada:
-```json
-{ "id": 4, "name": "Monitor LED", "price": 90000 }
-```
-
-**PUT /products/4/**
-```json
-{
-  "name": "Monitor LED 24",
-  "price": 110000
-}
-```
-
-**DELETE /products/4/**
-```json
-{ "message": "Producto eliminado correctamente." }
-```
-
----
-
-## Arquitectura del Modulo de Productos
-
-El modulo sigue una arquitectura backend por capas, donde cada archivo tiene una unica responsabilidad.
-
-```text
+TP Integrador - Sistema de Gestión Comercial y Ventas
+Universidad Escuela Argentina de Negocios (UEAN)
+Lic. en Tecnología Informática - Introducción al Desarrollo de Software 2026
+Descripción del Proyecto
+Sistema backend desarrollado con Django y complementado con FastAPI, orientado a la gestión comercial y de ventas.
+El sistema permite administrar productos, clientes y operaciones comerciales, utilizando una arquitectura por capas y persistencia mediante Django ORM. Para el entorno con contenedores se utiliza PostgreSQL mediante Docker Compose.
+Tecnologías utilizadas
+•	Python 3
+•	Django
+•	Django ORM
+•	FastAPI
+•	Uvicorn
+•	PostgreSQL
+•	Docker
+•	Docker Compose
+•	JSON REST
+•	Git y GitHub
+Arquitectura del Proyecto
+El proyecto sigue una arquitectura modular por capas:
 HTTP Request
      |
- Controller        <- recibe la peticion HTTP, devuelve JSON
+ Controller        <- recibe la petición HTTP y devuelve respuestas JSON
      |
-  Service          <- contiene la logica de negocio
+ Service           <- contiene la lógica de negocio
      |
- Repository        <- accede a los datos (lista en memoria)
+ Repository        <- accede a los datos mediante Django ORM
      |
-   Model           <- define la entidad Product
-```
+ Model             <- define las entidades del sistema
+     |
+ Database          <- PostgreSQL / base configurada por Django
 
----
+Módulos principales:
+•	Productos
+•	Clientes
+•	Ventas
+•	API complementaria con FastAPI
+Ejecución local con Django
+1. Activar el entorno virtual
+.\venv\Scripts\activate
 
-## Tecnologias utilizadas
+2. Instalar dependencias
+pip install -r requirements.txt
 
-- **Python 3.x**
-- **Django 6.0.6**
-- **SQLite** (base de datos interna de Django para sesiones y admin)
-- **JSON** como formato de respuesta de la API
+3. Aplicar migraciones
+python manage.py migrate
+
+4. Levantar el servidor de Django
+python manage.py runserver
+
+El servidor queda disponible en:
+http://127.0.0.1:8000/
+
+Ejecución con FastAPI
+FastAPI funciona como API complementaria y reutiliza la lógica existente del proyecto Django.
+Con el entorno virtual activado, ejecutar:
+python -m uvicorn fastapi_app.main:app --reload --port 8001
+
+La API queda disponible en:
+http://127.0.0.1:8001/
+
+Endpoints principales de FastAPI:
+http://127.0.0.1:8001/products
+http://127.0.0.1:8001/clients
+http://127.0.0.1:8001/sales
+
+Ejecución con Docker
+El proyecto incluye configuración con Docker Compose para levantar Django junto con PostgreSQL.
+docker compose up --build
+
+Para detener los servicios:
+docker compose down
+
+Servicios incluidos:
+•	django: aplicación Django disponible en http://127.0.0.1:8000/
+•	postgres: base de datos PostgreSQL
+Endpoints disponibles en Django
+Método	URL	Descripción
+GET	/products/	Lista todos los productos
+GET	/products/<id>/	Obtiene un producto por ID
+POST	/products/	Crea un producto
+PUT	/products/<id>/	Modifica un producto existente
+DELETE	/products/<id>/	Elimina un producto existente
+POST	/admin/products/	Crea un producto indicando ID
+PUT	/admin/products/<id>/	Modifica un producto desde ruta administrativa
+DELETE	/admin/products/<id>/	Elimina un producto desde ruta administrativa
+GET	/clients/	Lista todos los clientes
+GET	/clients/<id>/	Obtiene un cliente por ID
+POST	/clients/	Crea un cliente
+PUT	/clients/<id>/	Modifica un cliente
+DELETE	/clients/<id>/	Elimina un cliente
+GET	/sales/	Lista todas las ventas
+GET	/sales/<id>/	Obtiene una venta por ID
+POST	/sales/	Crea una venta
+
+Endpoints disponibles en FastAPI
+Método	URL	Descripción
+GET	/	Endpoint inicial de prueba
+GET	/products	Lista todos los productos
+GET	/products/{product_id}	Obtiene un producto por ID
+GET	/clients	Lista todos los clientes
+GET	/sales	Lista todas las ventas
+GET	/sales/{sale_id}	Obtiene una venta por ID
+
+Ejemplos de uso
+Crear un producto
+Invoke-RestMethod -Uri "http://127.0.0.1:8000/products/" -Method POST -ContentType "application/json" -Body '{"name":"Mouse Gamer","price":15000}'
+
+Ejemplo de respuesta:
+{
+  "id": 1,
+  "name": "Mouse Gamer",
+  "price": 15000
+}
+
+Crear un cliente
+Invoke-RestMethod -Uri "http://127.0.0.1:8000/clients/" -Method POST -ContentType "application/json" -Body '{"id":1,"name":"Juan Perez","email":"juan.perez@gmail.com","phone":"1122334455"}'
+
+Ejemplo de respuesta:
+{
+  "id": 1,
+  "name": "Juan Perez",
+  "email": "juan.perez@gmail.com",
+  "phone": "1122334455"
+}
+
+Crear una venta
+Invoke-RestMethod -Uri "http://127.0.0.1:8000/sales/" -Method POST -ContentType "application/json" -Body '{"client_id":1,"product_id":1,"quantity":2,"status":"pendiente"}'
+
+Ejemplo de respuesta:
+{
+  "id": 1,
+  "client_id": 1,
+  "product_id": 1,
+  "quantity": 2,
+  "status": "pendiente",
+  "total": 30000
+}
+
+Validaciones y manejo de errores
+El sistema incluye validaciones para evitar datos incompletos o inconsistentes. También utiliza excepciones personalizadas y respuestas JSON con códigos HTTP adecuados.
+Ejemplos de respuestas posibles:
+•	200 OK
+•	201 Created
+•	400 Bad Request
+•	404 Not Found
+•	405 Method Not Allowed
+•	409 Conflict
+•	500 Internal Server Error
+Logging
+El proyecto utiliza logging en las capas principales para registrar operaciones, errores y eventos relevantes durante la ejecución.
+Estado actual
+El sistema permite:
+•	Administrar productos.
+•	Administrar clientes.
+•	Registrar y consultar ventas.
+•	Calcular el total de una venta según producto y cantidad.
+•	Consultar datos desde Django.
+•	Consultar datos desde FastAPI.
+•	Ejecutar el proyecto localmente.
+•	Ejecutar el proyecto mediante Docker con PostgreSQL.
+
