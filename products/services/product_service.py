@@ -3,6 +3,7 @@ from products.exceptions.product_exception import (
     ProductNotFoundException,
     ProductValidationException,
 )
+from products.models.product import Product
 from products.repositories.product_repository import ProductRepository
 from products.validators.product_validator import ProductValidator
 
@@ -22,17 +23,36 @@ class ProductService:
         """Obtiene un producto especifico por su ID."""
         return self.repository.find_by_id(product_id)
 
-    def create_product(self, name, price):
-        """Crea un producto nuevo luego de validar sus datos."""
+    def create_product(self, *args):
+        """
+        Crea un producto.
+        Acepta (name, price) para ID automatico o (product_id, name, price)
+        para mantener compatibilidad con endpoints administrativos.
+        """
+        if len(args) == 2:
+            product_id = None
+            name, price = args
+        elif len(args) == 3:
+            product_id, name, price = args
+        else:
+            raise ProductValidationException('Datos de producto invalidos.')
+
         self._validate_product_data(name, price)
 
         if self.repository.find_by_name(name) is not None:
             raise ProductAlreadyExistsException(name)
 
-        return self.repository.save(name.strip(), price)
+        if product_id is None:
+            return self.repository.save(name.strip(), price)
+
+        try:
+            product = Product(product_id, name.strip(), price)
+            return self.repository.create(product)
+        except ValueError as error:
+            raise ProductValidationException(str(error)) from error
 
     def update_product(self, product_id, name, price):
-        """Actualiza un producto existente."""
+        """Actualiza un producto existente validando sus datos."""
         product = self.repository.find_by_id(product_id)
 
         if product is None:
@@ -50,11 +70,13 @@ class ProductService:
         return self.repository.update(product_id, name.strip(), price)
 
     def delete_product(self, product_id):
-        """Elimina un producto existente."""
+        """Elimina un producto por su ID."""
         deleted = self.repository.delete(product_id)
 
         if not deleted:
             raise ProductNotFoundException(product_id)
+
+        return True
 
     def _validate_product_data(self, name, price):
         """Centraliza las validaciones del producto."""

@@ -8,11 +8,17 @@ class ProductRepository:
     En clases futuras, aqui se usaran consultas a PostgreSQL.
     """
 
-    products = [
-        Product(1, 'Mouse Gamer', 15000),
-        Product(2, 'Teclado Mecanico', 45000),
-        Product(3, 'Smart Watch', 120000),
+    _initial_products_data = [
+        (1, 'Mouse Gamer', 15000),
+        (2, 'Teclado Mecanico', 45000),
+        (3, 'Smart Watch', 120000),
     ]
+    products = [Product(*data) for data in _initial_products_data]
+
+    @classmethod
+    def reset_data(cls):
+        """Restablece la lista de productos a su estado inicial."""
+        cls.products = [Product(*data) for data in cls._initial_products_data]
 
     def find_all(self):
         """Devuelve todos los productos disponibles."""
@@ -37,13 +43,21 @@ class ProductRepository:
         return None
 
     def save(self, name, price):
-        """Agrega un producto nuevo a la lista en memoria."""
+        """Agrega un producto nuevo con ID automatico."""
         product = Product(self._get_next_id(), name, price)
         self.products.append(product)
         return product
 
+    def create(self, product):
+        """Agrega un producto con ID definido por el caller."""
+        if self.find_by_id(product.product_id) is not None:
+            raise ValueError(f'Ya existe un producto con ID {product.product_id}.')
+
+        self.products.append(product)
+        return product
+
     def update(self, product_id, name, price):
-        """Actualiza un producto existente."""
+        """Actualiza los datos de un producto existente."""
         product = self.find_by_id(product_id)
 
         if product is None:
@@ -54,7 +68,7 @@ class ProductRepository:
         return product
 
     def delete(self, product_id):
-        """Elimina un producto por ID. Devuelve True si lo elimina."""
+        """Elimina un producto por su ID."""
         product = self.find_by_id(product_id)
 
         if product is None:

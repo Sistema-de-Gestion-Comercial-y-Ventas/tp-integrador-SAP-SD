@@ -15,3 +15,13 @@ class ClientNotFoundException(ClientException):
             message=f'Cliente con ID {client_id} no encontrado.',
             status_code=404
         )
+
+
+class ClientAlreadyExistsException(ClientException):
+    """Se lanza cuando ya existe un cliente con el mismo ID."""
+
+    def __init__(self, client_id):
+        super().__init__(
+            message=f'Ya existe un cliente con ID {client_id}.',
+            status_code=409
+        )
