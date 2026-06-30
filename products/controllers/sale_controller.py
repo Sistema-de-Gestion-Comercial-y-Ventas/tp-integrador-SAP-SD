@@ -1,3 +1,4 @@
+import json
 import logging
 
 from django.http import JsonResponse
@@ -16,6 +17,14 @@ class SaleController:
 
     def __init__(self):
         self.service = SaleService()
+
+    def sale_collection(self, request):
+        """Maneja GET y POST sobre /sales/."""
+        if request.method == 'GET':
+            return self.get_sales(request)
+        if request.method == 'POST':
+            return self.create_sale(request)
+        return JsonResponse({'error': 'Método no permitido'}, status=405)
 
     def get_sales(self, _request):
         """Maneja GET /sales/. Devuelve la lista completa de ventas en formato JSON."""
@@ -36,6 +45,39 @@ class SaleController:
         except Exception as error:
             logger.error("Error en get_sales: %s", error)
 
+            return JsonResponse(
+                {"error": "Error interno del servidor"},
+                status=500
+            )
+
+    def create_sale(self, request):
+        """Maneja POST /sales/. Crea una nueva venta."""
+        logger.info("POST /sales/ - Creando venta")
+
+        try:
+            data = json.loads(request.body)
+
+            client_id = data.get('client_id')
+            product_id = data.get('product_id')
+            quantity = data.get('quantity')
+            status = data.get('status', 'pending')
+
+            sale_dto = self.service.create_sale(
+                client_id,
+                product_id,
+                quantity,
+                status
+            )
+
+            logger.info("POST /sales/ - Venta creada correctamente")
+            return JsonResponse(sale_dto.to_dict(), status=201)
+
+        except ValueError as error:
+            logger.warning("POST /sales/ - %s", error)
+            return JsonResponse({"error": str(error)}, status=400)
+
+        except Exception as error:
+            logger.error("Error en create_sale: %s", error)
             return JsonResponse(
                 {"error": "Error interno del servidor"},
                 status=500

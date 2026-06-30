@@ -60,3 +60,22 @@ class SaleService:
             sale.status,
             total
         )
+    
+    def create_sale(self, client_id, product_id, quantity, status='pending'):
+        """Crea una venta y devuelve el DTO con el total calculado."""
+        sale = self.sale_repository.create(client_id, product_id, quantity, status)
+
+        product = self.product_repository.find_by_id(sale.product_id)
+
+        total = 0
+        if product is not None:
+            total = product.price * sale.quantity
+
+        return SaleDTO(
+            sale.id,
+            sale.client_id,
+            sale.product_id,
+            sale.quantity,
+            sale.status,
+            total
+        )
