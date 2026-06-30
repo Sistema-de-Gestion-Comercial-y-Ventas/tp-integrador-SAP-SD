@@ -21,7 +21,7 @@ def get_products():
 
     for product in products:
         data.append({
-            "id": product.product_id,
+            "id": product.id,
             "name": product.name,
             "price": product.price,
         })
@@ -41,7 +41,7 @@ def get_product_by_id(product_id: int):
         )
 
     return {
-        "id": product.product_id,
+        "id": product.id,
         "name": product.name,
         "price": product.price,
     }
@@ -56,7 +56,7 @@ def get_clients():
 
     for client in clients:
         data.append({
-            "id": client.client_id,
+            "id": client.id,
             "name": client.name,
             "email": client.email,
             "phone": client.phone,

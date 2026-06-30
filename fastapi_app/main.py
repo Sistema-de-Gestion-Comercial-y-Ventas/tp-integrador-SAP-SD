@@ -1,7 +1,12 @@
+import os
+import django
+
 from fastapi import FastAPI
 
-from fastapi_app.routes import router
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
+django.setup()
 
+from fastapi_app.routes import router
 
 app = FastAPI(
     title="Sistema de Gestión Comercial y Ventas - FastAPI",
