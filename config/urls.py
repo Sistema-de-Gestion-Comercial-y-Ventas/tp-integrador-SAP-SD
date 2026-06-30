@@ -29,6 +29,6 @@ urlpatterns = [
     path('clients/<int:client_id>/', csrf_exempt(client_controller.client_detail)),
 
     # Endpoints de ventas
-    path('sales/', sale_controller.get_sales),
-    path('sales/<int:sale_id>/', sale_controller.get_sale_by_id),
+    path('sales/', csrf_exempt(sale_controller.get_sales)),
+    path('sales/<int:sale_id>/', csrf_exempt(sale_controller.get_sale_by_id)),
 ]
