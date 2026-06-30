@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.urls import path
+from django.views.decorators.csrf import csrf_exempt
 
 
 from products.controllers.product_controller import ProductController
@@ -15,8 +16,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     # Endpoint: GET /products/
-    path('products/', controller.get_products),
-    path('products/<int:product_id>/', controller.get_product_by_id),
+    path('products/', csrf_exempt(controller.products)),
+    path('products/<int:product_id>/', csrf_exempt(controller.product_detail)),
 
     path('clients/', client_controller.get_clients),
 ]

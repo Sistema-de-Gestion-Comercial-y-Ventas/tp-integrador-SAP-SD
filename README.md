@@ -45,6 +45,9 @@ El servidor queda disponible en `http://127.0.0.1:8000/`
 |---|---|---|---|
 | GET | `/products/` | Lista todos los productos | 200 OK — array JSON |
 | GET | `/products/<id>/` | Obtiene un producto por ID | 200 OK o 404 Not Found |
+| POST | `/products/` | Crea un producto | 201 Created, 400 Bad Request o 409 Conflict |
+| PUT | `/products/<id>/` | Modifica un producto existente | 200 OK, 400 Bad Request, 404 Not Found o 409 Conflict |
+| DELETE | `/products/<id>/` | Elimina un producto existente | 200 OK o 404 Not Found |
 | GET | `/clients/` | Lista todos los clientes | 200 OK — array JSON |
 
 ### Ejemplos de respuesta
@@ -66,6 +69,32 @@ El servidor queda disponible en `http://127.0.0.1:8000/`
 **GET /products/99/** *(producto inexistente)*
 ```json
 { "error": "Producto con ID 99 no encontrado." }
+```
+
+**POST /products/**
+```json
+{
+  "name": "Monitor LED",
+  "price": 90000
+}
+```
+
+Respuesta esperada:
+```json
+{ "id": 4, "name": "Monitor LED", "price": 90000 }
+```
+
+**PUT /products/4/**
+```json
+{
+  "name": "Monitor LED 24",
+  "price": 110000
+}
+```
+
+**DELETE /products/4/**
+```json
+{ "message": "Producto eliminado correctamente" }
 ```
 
 ---
