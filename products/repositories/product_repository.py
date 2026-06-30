@@ -9,7 +9,7 @@ class ProductRepository:
 
     def find_all(self):
         """Devuelve todos los productos disponibles."""
-        return Product.objects.all()
+        return Product.objects.all().order_by('id')
 
     def find_by_id(self, product_id):
         """Busca un producto por su ID. Devuelve None si no existe."""
