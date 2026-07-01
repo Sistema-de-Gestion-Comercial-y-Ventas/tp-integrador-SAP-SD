@@ -1,7 +1,7 @@
 class SaleValidator:
     """Validador de datos para ventas."""
 
-    VALID_STATUSES = ["pendiente", "confirmada", "cancelada"]
+    VALID_STATUSES = ["pending", "completed", "cancelled"]
 
     def validate_quantity(self, quantity):
         """Valida que la cantidad vendida sea un número entero mayor a cero."""

@@ -30,5 +30,5 @@ urlpatterns = [
 
     # Endpoints de ventas
     path('sales/', csrf_exempt(sale_controller.sale_collection)),
-    path('sales/<int:sale_id>/', csrf_exempt(sale_controller.get_sale_by_id)),
+    path('sales/<int:sale_id>/', csrf_exempt(sale_controller.sale_detail)),
 ]

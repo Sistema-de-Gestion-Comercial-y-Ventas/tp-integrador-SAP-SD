@@ -1,4 +1,8 @@
+import logging
+
 from products.models.sale import Sale
+
+logger = logging.getLogger(__name__)
 
 
 class SaleRepository:
@@ -9,6 +13,7 @@ class SaleRepository:
 
     def find_all(self):
         """Devuelve todas las ventas registradas."""
+        logger.info("Repository ventas - Consultando todas las ventas")
         return Sale.objects.all().order_by('id')
 
     def find_by_id(self, sale_id):
@@ -16,6 +21,7 @@ class SaleRepository:
         try:
             return Sale.objects.get(id=sale_id)
         except Sale.DoesNotExist:
+            logger.warning("Repository ventas - Venta con ID %s no encontrada", sale_id)
             return None
 
     def create(self, client_id, product_id, quantity, status='pending'):
@@ -26,6 +32,7 @@ class SaleRepository:
             quantity=quantity,
             status=status
         )
+        logger.info("Repository ventas - Venta %s creada", sale.id)
         return sale
 
     def update(self, sale_id, quantity, status):
@@ -35,8 +42,10 @@ class SaleRepository:
             sale.quantity = quantity
             sale.status = status
             sale.save()
+            logger.info("Repository ventas - Venta %s actualizada", sale_id)
             return sale
         except Sale.DoesNotExist:
+            logger.warning("Repository ventas - No se pudo actualizar venta %s inexistente", sale_id)
             return None
 
     def delete(self, sale_id):
@@ -44,6 +53,8 @@ class SaleRepository:
         try:
             sale = Sale.objects.get(id=sale_id)
             sale.delete()
+            logger.info("Repository ventas - Venta %s eliminada", sale_id)
             return True
         except Sale.DoesNotExist:
+            logger.warning("Repository ventas - No se pudo eliminar venta %s inexistente", sale_id)
             return False

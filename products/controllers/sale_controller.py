@@ -4,7 +4,7 @@ import logging
 from django.http import JsonResponse
 
 from products.services.sale_service import SaleService
-from products.exceptions.sale_exception import SaleNotFoundException
+from products.exceptions.sale_exception import SaleException, SaleNotFoundException
 
 logger = logging.getLogger(__name__)
 
@@ -72,9 +72,9 @@ class SaleController:
             logger.info("POST /sales/ - Venta creada correctamente")
             return JsonResponse(sale_dto.to_dict(), status=201)
 
-        except ValueError as error:
-            logger.warning("POST /sales/ - %s", error)
-            return JsonResponse({"error": str(error)}, status=400)
+        except SaleException as error:
+            logger.warning("POST /sales/ - %s", error.message)
+            return JsonResponse({"error": error.message}, status=error.status_code)
 
         except Exception as error:
             logger.error("Error en create_sale: %s", error)
@@ -110,3 +110,57 @@ class SaleController:
                 {"error": "Error interno del servidor"},
                 status=500
             )
+
+    def sale_detail(self, request, sale_id):
+        """Maneja GET, PUT y DELETE sobre /sales/<id>/."""
+        if request.method == 'GET':
+            return self.get_sale_by_id(request, sale_id)
+        if request.method == 'PUT':
+            return self.update_sale(request, sale_id)
+        if request.method == 'DELETE':
+            return self.delete_sale(request, sale_id)
+        return JsonResponse({'error': 'Método no permitido'}, status=405)
+
+    def update_sale(self, request, sale_id):
+        """Maneja PUT /sales/<id>/. Actualiza una venta."""
+        logger.info("PUT /sales/%s/ - Actualizando venta", sale_id)
+
+        try:
+            data = json.loads(request.body)
+            quantity = data.get('quantity')
+            status = data.get('status')
+
+            sale_dto = self.service.update_sale(sale_id, quantity, status)
+
+            logger.info("PUT /sales/%s/ - Venta actualizada correctamente", sale_id)
+            return JsonResponse(sale_dto.to_dict(), status=200)
+
+        except SaleException as error:
+            logger.warning("PUT /sales/%s/ - %s", sale_id, error.message)
+            return JsonResponse({"error": error.message}, status=error.status_code)
+
+        except ValueError as error:
+            logger.warning("PUT /sales/%s/ - %s", sale_id, error)
+            return JsonResponse({"error": str(error)}, status=400)
+
+        except Exception as error:
+            logger.error("Error en update_sale: %s", error)
+            return JsonResponse({"error": "Error interno del servidor"}, status=500)
+
+    def delete_sale(self, _request, sale_id):
+        """Maneja DELETE /sales/<id>/. Elimina una venta."""
+        logger.info("DELETE /sales/%s/ - Eliminando venta", sale_id)
+
+        try:
+            self.service.delete_sale(sale_id)
+
+            logger.info("DELETE /sales/%s/ - Venta eliminada correctamente", sale_id)
+            return JsonResponse({"message": "Venta eliminada correctamente."}, status=200)
+
+        except SaleException as error:
+            logger.warning("DELETE /sales/%s/ - %s", sale_id, error.message)
+            return JsonResponse({"error": error.message}, status=error.status_code)
+
+        except Exception as error:
+            logger.error("Error en delete_sale: %s", error)
+            return JsonResponse({"error": "Error interno del servidor"}, status=500)

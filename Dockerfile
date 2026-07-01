@@ -12,6 +12,6 @@ RUN pip install --upgrade pip \
 
 COPY . .
 
-EXPOSE 8000
+EXPOSE 8000 8001
 
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]

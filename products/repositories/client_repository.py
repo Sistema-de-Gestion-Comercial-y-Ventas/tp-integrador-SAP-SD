@@ -1,5 +1,9 @@
+import logging
+
 from products.exceptions.client_exception import ClientAlreadyExistsException
 from products.models.client import Client
+
+logger = logging.getLogger(__name__)
 
 
 class ClientRepository:
@@ -10,6 +14,7 @@ class ClientRepository:
 
     def find_all(self):
         """Devuelve todos los clientes registrados."""
+        logger.info("Repository clientes - Consultando todos los clientes")
         return Client.objects.all().order_by('id')
 
     def find_by_id(self, client_id):
@@ -17,6 +22,7 @@ class ClientRepository:
         try:
             return Client.objects.get(id=client_id)
         except Client.DoesNotExist:
+            logger.warning("Repository clientes - Cliente con ID %s no encontrado", client_id)
             return None
 
     def create(self, name, email, phone):
@@ -29,6 +35,7 @@ class ClientRepository:
             pass
 
         client = Client.objects.create(name=name, email=email, phone=phone)
+        logger.info("Repository clientes - Cliente %s creado", client.id)
         return client
 
     def update(self, client_id, name, email, phone):
@@ -39,8 +46,10 @@ class ClientRepository:
             client.email = email
             client.phone = phone
             client.save()
+            logger.info("Repository clientes - Cliente %s actualizado", client_id)
             return client
         except Client.DoesNotExist:
+            logger.warning("Repository clientes - No se pudo actualizar cliente %s inexistente", client_id)
             return None
 
     def delete(self, client_id):
@@ -48,6 +57,8 @@ class ClientRepository:
         try:
             client = Client.objects.get(id=client_id)
             client.delete()
+            logger.info("Repository clientes - Cliente %s eliminado", client_id)
             return True
         except Client.DoesNotExist:
+            logger.warning("Repository clientes - No se pudo eliminar cliente %s inexistente", client_id)
             return False

@@ -1,3 +1,5 @@
+import logging
+
 from products.exceptions.product_exception import (
     ProductAlreadyExistsException,
     ProductNotFoundException,
@@ -6,6 +8,8 @@ from products.exceptions.product_exception import (
 from products.models.product import Product
 from products.repositories.product_repository import ProductRepository
 from products.validators.product_validator import ProductValidator
+
+logger = logging.getLogger(__name__)
 
 
 class ProductService:
@@ -17,6 +21,7 @@ class ProductService:
 
     def get_products(self):
         """Obtiene la lista completa de productos."""
+        logger.info("Service productos - Obteniendo productos")
         return self.repository.find_all()
 
     def get_product_by_id(self, product_id):
@@ -40,8 +45,10 @@ class ProductService:
         self._validate_product_data(name, price)
 
         if self.repository.find_by_name(name) is not None:
+            logger.warning("Service productos - Producto duplicado: %s", name)
             raise ProductAlreadyExistsException(name)
 
+        logger.info("Service productos - Creando producto %s", name)
         return self.repository.create(name.strip(), price)
 
     def update_product(self, product_id, name, price):
@@ -49,6 +56,7 @@ class ProductService:
         product = self.repository.find_by_id(product_id)
 
         if product is None:
+            logger.warning("Service productos - Producto %s no encontrado para actualizar", product_id)
             raise ProductNotFoundException(product_id)
 
         self._validate_product_data(name, price)
@@ -58,8 +66,10 @@ class ProductService:
             product_with_same_name is not None
             and product_with_same_name.id != product_id
         ):
+            logger.warning("Service productos - Nombre duplicado al actualizar: %s", name)
             raise ProductAlreadyExistsException(name)
 
+        logger.info("Service productos - Actualizando producto %s", product_id)
         return self.repository.update(product_id, name.strip(), price)
 
     def delete_product(self, product_id):
@@ -67,8 +77,10 @@ class ProductService:
         deleted = self.repository.delete(product_id)
 
         if not deleted:
+            logger.warning("Service productos - Producto %s no encontrado para eliminar", product_id)
             raise ProductNotFoundException(product_id)
 
+        logger.info("Service productos - Producto %s eliminado", product_id)
         return True
 
     def _validate_product_data(self, name, price):

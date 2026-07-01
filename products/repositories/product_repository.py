@@ -1,4 +1,8 @@
+import logging
+
 from products.models.product import Product
+
+logger = logging.getLogger(__name__)
 
 
 class ProductRepository:
@@ -9,6 +13,7 @@ class ProductRepository:
 
     def find_all(self):
         """Devuelve todos los productos disponibles."""
+        logger.info("Repository productos - Consultando todos los productos")
         return Product.objects.all().order_by('id')
 
     def find_by_id(self, product_id):
@@ -16,6 +21,7 @@ class ProductRepository:
         try:
             return Product.objects.get(id=product_id)
         except Product.DoesNotExist:
+            logger.warning("Repository productos - Producto con ID %s no encontrado", product_id)
             return None
 
     def find_by_name(self, name):
@@ -27,6 +33,7 @@ class ProductRepository:
 
     def create(self, name, price):
         """Crea un nuevo producto."""
+        logger.info("Repository productos - Creando producto %s", name)
         product = Product.objects.create(name=name, price=price)
         return product
 
@@ -37,8 +44,10 @@ class ProductRepository:
             product.name = name
             product.price = price
             product.save()
+            logger.info("Repository productos - Producto %s actualizado", product_id)
             return product
         except Product.DoesNotExist:
+            logger.warning("Repository productos - No se pudo actualizar producto %s inexistente", product_id)
             return None
 
     def delete(self, product_id):
@@ -46,6 +55,8 @@ class ProductRepository:
         try:
             product = Product.objects.get(id=product_id)
             product.delete()
+            logger.info("Repository productos - Producto %s eliminado", product_id)
             return True
         except Product.DoesNotExist:
+            logger.warning("Repository productos - No se pudo eliminar producto %s inexistente", product_id)
             return False

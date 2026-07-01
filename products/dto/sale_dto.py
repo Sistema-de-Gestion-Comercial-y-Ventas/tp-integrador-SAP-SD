@@ -10,7 +10,7 @@ class SaleDTO:
         self.product_id = product_id
         self.quantity = quantity
         self.status = status
-        self.total = total
+        self.total = float(total)
 
     def to_dict(self):
         """Convierte el DTO a un diccionario serializable a JSON."""

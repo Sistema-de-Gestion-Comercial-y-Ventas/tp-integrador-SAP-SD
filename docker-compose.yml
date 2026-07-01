@@ -18,6 +18,25 @@ services:
       db:
         condition: service_healthy
 
+  api:
+    build: .
+    container_name: tp_integrador_fastapi
+    command: uvicorn fastapi_app.main:app --host 0.0.0.0 --port 8001
+    volumes:
+      - .:/app
+    ports:
+      - "8001:8001"
+    environment:
+      DJANGO_DB_ENGINE: django.db.backends.postgresql
+      DJANGO_DB_NAME: tp_integrador
+      DJANGO_DB_USER: tp_user
+      DJANGO_DB_PASSWORD: tp_password
+      DJANGO_DB_HOST: db
+      DJANGO_DB_PORT: 5432
+    depends_on:
+      db:
+        condition: service_healthy
+
   db:
     image: postgres:16
     container_name: tp_integrador_postgres
