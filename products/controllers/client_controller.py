@@ -25,7 +25,7 @@ class ClientController:
             return self.get_clients(request)
         if request.method == 'POST':
             return self.create_client(request)
-        return JsonResponse({'error': 'Método no permitido'}, status=405)
+        return JsonResponse({'error': 'Metodo no permitido'}, status=405)
 
     def get_clients(self, _request):
         logger.info("GET /clients/ - Consultando lista de clientes")
@@ -104,7 +104,7 @@ class ClientController:
             return self.update_client(request, client_id)
         if request.method == 'DELETE':
             return self.delete_client(request, client_id)
-        return JsonResponse({'error': 'Método no permitido'}, status=405)
+        return JsonResponse({'error': 'Metodo no permitido'}, status=405)
 
     def update_client(self, request, client_id):
         logger.info("PUT /clients/%s/ - Actualizando cliente", client_id)

@@ -56,9 +56,9 @@ class ClientServiceTests(TestCase):
 
     def setUp(self):
         # Crear clientes de prueba en la base de datos
-        self.juan = Client.objects.create(name="Juan Pérez", email="juan.perez@gmail.com", phone="1122334455")
-        self.maria = Client.objects.create(name="María Gómez", email="maria.gomez@gmail.com", phone="1166778899")
-        self.carlos = Client.objects.create(name="Carlos López", email="carlos.lopez@gmail.com", phone="1199887766")
+        self.juan = Client.objects.create(name="Juan Perez", email="juan.perez@gmail.com", phone="1122334455")
+        self.maria = Client.objects.create(name="Maria Gomez", email="maria.gomez@gmail.com", phone="1166778899")
+        self.carlos = Client.objects.create(name="Carlos Lopez", email="carlos.lopez@gmail.com", phone="1199887766")
         self.service = ClientService()
 
     def test_create_client(self):
@@ -90,22 +90,22 @@ class ClientControllerTests(TestCase):
 
     def setUp(self):
         # Crear clientes de prueba en la base de datos
-        self.juan = Client.objects.create(name="Juan Pérez", email="juan.perez@gmail.com", phone="1122334455")
-        self.maria = Client.objects.create(name="María Gómez", email="maria.gomez@gmail.com", phone="1166778899")
-        self.carlos = Client.objects.create(name="Carlos López", email="carlos.lopez@gmail.com", phone="1199887766")
+        self.juan = Client.objects.create(name="Juan Perez", email="juan.perez@gmail.com", phone="1122334455")
+        self.maria = Client.objects.create(name="Maria Gomez", email="maria.gomez@gmail.com", phone="1166778899")
+        self.carlos = Client.objects.create(name="Carlos Lopez", email="carlos.lopez@gmail.com", phone="1199887766")
         self.client = DjangoClient()
 
     def test_get_clients_via_api(self):
         response = self.client.get("/clients/")
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json()[0]["name"], "Juan Pérez")
+        self.assertEqual(response.json()[0]["name"], "Juan Perez")
 
     def test_get_client_by_id_via_api(self):
         response = self.client.get(f"/clients/{self.maria.id}/")
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json()["name"], "María Gómez")
+        self.assertEqual(response.json()["name"], "Maria Gomez")
 
     def test_create_client_via_api(self):
         response = self.client.post(

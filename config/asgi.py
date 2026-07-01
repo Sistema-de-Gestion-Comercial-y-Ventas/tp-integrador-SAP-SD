@@ -1,10 +1,8 @@
 """
-ASGI config for config project.
+Configuracion ASGI del proyecto.
 
-It exposes the ASGI callable as a module-level variable named ``application``.
-
-For more information on this file, see
-https://docs.djangoproject.com/en/6.0/howto/deployment/asgi/
+Expone la aplicacion ASGI en la variable ``application``.
+Mas informacion: https://docs.djangoproject.com/en/6.0/howto/deployment/asgi/
 """
 
 import os

@@ -1,3 +1,3 @@
 from django.shortcuts import render
 
-# Create your views here.
+# Las respuestas HTTP se manejan desde la capa de controllers.

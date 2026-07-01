@@ -3,7 +3,7 @@ from django.db import models
 
 class Product(models.Model):
     """
-    Modelo Django que representa un producto del catálogo.
+    Modelo Django que representa un producto del catalogo.
     Almacenado en PostgreSQL.
     """
     name = models.CharField(max_length=255, null=False)

@@ -1,6 +1,6 @@
-﻿TP Integrador - Sistema de Gestion Comercial y Ventas
+TP Integrador - Sistema de Gestion Comercial y Ventas
 Universidad Escuela Argentina de Negocios (UEAN)
-Lic. en TecnologÃ­a InformÃ¡tica - Introduccion al Desarrollo de Software 2026
+Lic. en Tecnologia Informatica - Introduccion al Desarrollo de Software 2026
 Descripcion del Proyecto
 Sistema backend desarrollado con Django y complementado con FastAPI, orientado a la gestion comercial y de ventas.
 El sistema permite administrar productos, clientes y operaciones comerciales, utilizando una arquitectura por capas y persistencia mediante Django ORM. Para el entorno con contenedores se utiliza PostgreSQL mediante Docker Compose.
@@ -71,7 +71,7 @@ Para detener los servicios:
 docker compose down
 
 Servicios incluidos:
--	django: aplicaciÃ³n Django disponible en http://127.0.0.1:8000/
+-	django: aplicacion Django disponible en http://127.0.0.1:8000/
 -	postgres: base de datos PostgreSQL
 Endpoints disponibles en Django
 Metodo	URL	Descripcion
@@ -144,7 +144,7 @@ Ejemplo de respuesta:
   "client_id": 1,
   "product_id": 1,
   "quantity": 2,
-  "status": "pendiente",
+  "status": "pending",
   "total": 30000
 }
 
@@ -159,13 +159,13 @@ Ejemplos de respuestas posibles:
 -	409 Conflict
 -	500 Internal Server Error
 Logging
-El proyecto utiliza logging en las capas principales para registrar operaciones, errores y eventos relevantes durante la ejecuciÃ³n.
+El proyecto utiliza logging en las capas principales para registrar operaciones, errores y eventos relevantes durante la ejecucion.
 Estado actual
 El sistema permite:
 -	Administrar productos.
 -	Administrar clientes.
 -	Registrar y consultar ventas.
--	Calcular el total de una venta segÃºn producto y cantidad.
+-	Calcular el total de una venta segun producto y cantidad.
 -	Consultar datos desde Django.
 -	Consultar datos desde FastAPI.
 -	Ejecutar el proyecto localmente.

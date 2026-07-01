@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 class ClientService:
     """
     Servicio de clientes.
-    Contiene la lógica de negocio y coordina el acceso a datos a través del Repository.
+    Contiene la logica de negocio y coordina el acceso a datos a traves del Repository.
     """
 
     def __init__(self):
@@ -23,7 +23,7 @@ class ClientService:
         return self.repository.find_all()
 
     def get_client_by_id(self, client_id):
-        """Obtiene un cliente específico por su ID."""
+        """Obtiene un cliente especifico por su ID."""
         return self.repository.find_by_id(client_id)
 
     def create_client(self, client_id, name, email, phone):

@@ -1,5 +1,5 @@
 class SaleException(Exception):
-    """Excepción base para errores del dominio de ventas."""
+    """Excepcion base para errores del dominio de ventas."""
 
     def __init__(self, message, status_code=400):
         super().__init__(message)
@@ -18,7 +18,7 @@ class SaleNotFoundException(SaleException):
 
 
 class InvalidSaleException(SaleException):
-    """Se lanza cuando una venta tiene datos inválidos."""
+    """Se lanza cuando una venta tiene datos invalidos."""
 
     def __init__(self, message):
         super().__init__(

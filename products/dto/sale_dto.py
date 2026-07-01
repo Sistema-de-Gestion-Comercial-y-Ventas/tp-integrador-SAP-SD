@@ -1,7 +1,7 @@
 class SaleDTO:
     """
     Data Transfer Object para ventas.
-    Define qué datos de una venta se exponen en la respuesta JSON.
+    Define que datos de una venta se exponen en la respuesta JSON.
     """
 
     def __init__(self, sale_id, client_id, product_id, quantity, status, total):

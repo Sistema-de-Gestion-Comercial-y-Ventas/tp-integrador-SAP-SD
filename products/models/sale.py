@@ -5,7 +5,7 @@ from products.models.product import Product
 
 class Sale(models.Model):
     """
-    Modelo Django que representa una venta u operación comercial.
+    Modelo Django que representa una venta u operacion comercial.
     Almacenado en PostgreSQL.
     """
     STATUS_CHOICES = [

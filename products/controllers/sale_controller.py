@@ -24,7 +24,7 @@ class SaleController:
             return self.get_sales(request)
         if request.method == 'POST':
             return self.create_sale(request)
-        return JsonResponse({'error': 'Método no permitido'}, status=405)
+        return JsonResponse({'error': 'Metodo no permitido'}, status=405)
 
     def get_sales(self, _request):
         """Maneja GET /sales/. Devuelve la lista completa de ventas en formato JSON."""
@@ -84,7 +84,7 @@ class SaleController:
             )
 
     def get_sale_by_id(self, _request, sale_id):
-        """Maneja GET /sales/<id>/. Devuelve una venta específica en formato JSON."""
+        """Maneja GET /sales/<id>/. Devuelve una venta especifica en formato JSON."""
         logger.info("GET /sales/%s/ - Consultando venta por ID", sale_id)
 
         try:
@@ -119,7 +119,7 @@ class SaleController:
             return self.update_sale(request, sale_id)
         if request.method == 'DELETE':
             return self.delete_sale(request, sale_id)
-        return JsonResponse({'error': 'Método no permitido'}, status=405)
+        return JsonResponse({'error': 'Metodo no permitido'}, status=405)
 
     def update_sale(self, request, sale_id):
         """Maneja PUT /sales/<id>/. Actualiza una venta."""

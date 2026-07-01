@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 class SaleService:
     """
     Servicio de ventas.
-    Contiene la lógica de negocio y coordina el acceso a datos.
+    Contiene la logica de negocio y coordina el acceso a datos.
     """
 
     def __init__(self):
@@ -50,7 +50,7 @@ class SaleService:
         return data
 
     def get_sale_by_id(self, sale_id):
-        """Obtiene una venta específica por su ID con el total calculado."""
+        """Obtiene una venta especifica por su ID con el total calculado."""
         sale = self.sale_repository.find_by_id(sale_id)
 
         if sale is None:

@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 class SaleRepository:
     """
     Repositorio de ventas usando Django ORM.
-    Consulta a PostgreSQL a través del ORM de Django.
+    Consulta a PostgreSQL a traves del ORM de Django.
     """
 
     def find_all(self):

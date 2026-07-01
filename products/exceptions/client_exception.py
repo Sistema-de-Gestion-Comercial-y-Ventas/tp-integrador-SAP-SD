@@ -1,5 +1,5 @@
 class ClientException(Exception):
-    """Excepción base para errores de clientes."""
+    """Excepcion base para errores de clientes."""
 
     def __init__(self, message, status_code=400):
         super().__init__(message)

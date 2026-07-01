@@ -1,3 +1,3 @@
 from django.db import models
 
-# Create your models here.
+# Los modelos principales estan separados en products/models/.
